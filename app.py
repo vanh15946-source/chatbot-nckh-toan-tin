@@ -15,7 +15,7 @@ def load_system():
     db = Chroma(persist_directory="chroma_db", embedding_function=embedding_model)
 
     llm = ChatGoogleGenerativeAI(
-    model="gemini-pro", # <-- Tên chuẩn quốc dân, bao chạy mọi phiên bản
+    model="gemini-1.5-flash",  # Trở lại bản xịn ban đầu
     google_api_key=st.secrets["GOOGLE_API_KEY"],
     temperature=0.3
 )

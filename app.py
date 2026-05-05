@@ -16,8 +16,8 @@ def load_system():
 
     # Tải LLM
     llm = ChatGoogleGenerativeAI(
-        model="gemini-1.5-flash",
-        google_api_key="AIzaSyDbnskpAfVsA_2YZEx-95prQi05SulIiOA",  # Ví dụ: "AIzaSyB..."
+        model="gemini-2.0-flash",
+        google_api_key="AIzaSyDBMrqqBOFfE3BWqTNiZDZa4Kih0-CTECU",  # Ví dụ: "AIzaSyB..."
         temperature=0.3  # Độ sáng tạo (0 là bám sát tài liệu nhất)
     )
 
@@ -90,10 +90,10 @@ if user_input := st.chat_input("Nhập câu hỏi của bạn về môn học...
                 with st.expander("📄 Xem các đoạn tài liệu tìm được"):
                     st.text(context_text)
 
-                full_response = llm.invoke(final_prompt)
+                full_response = llm.invoke(final_prompt).content
             else:
                 # Kịch bản 2: Không RAG (Hỏi thẳng Qwen)
-                full_response = llm.invoke(user_input)
+                full_response = llm.invoke(user_input).content
 
         message_placeholder.markdown(full_response)
 

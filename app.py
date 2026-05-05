@@ -3,7 +3,7 @@ import streamlit as st
 from langchain_community.vectorstores import Chroma
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_core.prompts import PromptTemplate
-
+from langchain_groq import ChatGroq
 
 # ==========================================
 # 1. TẢI TÀI NGUYÊN (CACHE ĐỂ KHÔNG BỊ LOAD LẠI NHIỀU LẦN)
@@ -15,11 +15,11 @@ def load_system():
     db = Chroma(persist_directory="chroma_db", embedding_function=embedding_model)
 
     # Tải LLM
-    llm = ChatGoogleGenerativeAI(
-        model="gemini-2.0-flash",
-        google_api_key="AIzaSyCiFD5cqMAFINtgyvLSOTvXAfJTefpq3AQ",  # Ví dụ: "AIzaSyB..."
-        temperature=0.3  # Độ sáng tạo (0 là bám sát tài liệu nhất)
-    )
+    llm = ChatGroq(
+    model="llama-3.3-70b-versatile",
+    api_key=os.getenv("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"),
+    temperature=0.3
+)
 
     # Tạo Prompt
     prompt_template = """

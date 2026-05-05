@@ -17,7 +17,7 @@ def load_system():
     # Tải LLM
     llm = ChatGoogleGenerativeAI(
         model="gemini-2.0-flash",
-        google_api_key="AIzaSyDBMrqqBOFfE3BWqTNiZDZa4Kih0-CTECU",  # Ví dụ: "AIzaSyB..."
+        google_api_key="AIzaSyCiFD5cqMAFINtgyvLSOTvXAfJTefpq3AQ",  # Ví dụ: "AIzaSyB..."
         temperature=0.3  # Độ sáng tạo (0 là bám sát tài liệu nhất)
     )
 

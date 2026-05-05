@@ -14,11 +14,12 @@ def load_system():
     embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
     db = Chroma(persist_directory="chroma_db", embedding_function=embedding_model)
 
-    llm = ChatGoogleGenerativeAI(
-    model="gemini-1.5-flash",  # Trở lại bản xịn ban đầu
-    google_api_key=st.secrets["GOOGLE_API_KEY"],
-    temperature=0.3
-)
+    
+llm = ChatGoogleGenerativeAI(
+        model="gemini-1.5-flash",
+        google_api_key="AIzaSyDbnskpAfVsA_2YZEx-95prQi05SulIiOA",  # Ví dụ: "AIzaSyB..."
+        temperature=0.3  # Độ sáng tạo (0 là bám sát tài liệu nhất)
+    )
 
     # Tạo Prompt
     prompt_template = """

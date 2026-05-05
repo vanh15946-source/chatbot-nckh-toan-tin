@@ -20,7 +20,7 @@ def load_system():
 
     llm = ChatGroq(
     model="llama-3.3-70b-versatile",
-    api_key=os.getenv("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"),
+    api_key=os.getenv("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"),
     temperature=0.3
 )
 

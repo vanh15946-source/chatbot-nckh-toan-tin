@@ -10,3 +10,4 @@ torch
 torchvision
 google-generativeai
 langchain-google-genai==2.0.10
+groq

@@ -2,7 +2,6 @@ streamlit
 langchain
 langchain-community
 langchain-huggingface
-langchain-google-genai
 chromadb
 sentence-transformers
 pypdf
@@ -10,3 +9,4 @@ protobuf==3.20.3
 torch
 torchvision
 google-generativeai
+langchain-groq

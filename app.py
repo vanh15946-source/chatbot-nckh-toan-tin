@@ -18,7 +18,6 @@ def load_system():
     embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
     db = Chroma(persist_directory="chroma_db", embedding_function=embedding_model)
 
-    # Tải LLM
     llm = ChatGroq(
     model="llama-3.3-70b-versatile",
     api_key=os.getenv("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"),

@@ -1,3 +1,7 @@
+from langchain_groq import ChatGroq
+import os
+from dotenv import load_dotenv
+load_dotenv()
 from langchain_google_genai import ChatGoogleGenerativeAI
 import streamlit as st
 from langchain_community.vectorstores import Chroma

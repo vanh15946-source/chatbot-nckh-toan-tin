@@ -8,21 +8,27 @@ from langchain_core.prompts import PromptTemplate
 from langchain_groq import ChatGroq
 
 # ==========================================
-# 1. TẢI TÀI NGUYÊN (CACHE ĐỂ KHÔNG BỊ LOAD LẠI NHIỀU LẦN)
+# 1. TẢI TÀI NGUYÊN
 # ==========================================
 @st.cache_resource
 def load_system():
-    # Tải mô hình Embedding và Database
-    embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
+    # Kiểm tra key tồn tại trước khi khởi động
+    groq_api_key = os.getenv("GROQ_API_KEY")
+    if not groq_api_key:
+        st.error("❌ Không tìm thấy GROQ_API_KEY trong file .env!")
+        st.stop()
+
+    embedding_model = HuggingFaceEmbeddings(
+        model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+    )
     db = Chroma(persist_directory="chroma_db", embedding_function=embedding_model)
 
     llm = ChatGroq(
-    model="llama-3.3-70b-versatile",
-    api_key=os.getenv("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"),
-    temperature=0.3
-)
+        model="llama-3.3-70b-versatile",
+        api_key=groq_api_key,  # ✅ Đọc từ biến, không hardcode
+        temperature=0.3
+    )
 
-    # Tạo Prompt
     prompt_template = """
     Bạn là một trợ lý AI học tập xuất sắc của sinh viên. Hãy trả lời câu hỏi DỰA TRÊN các đoạn tài liệu được cung cấp dưới đây.
 
@@ -45,58 +51,47 @@ def load_system():
 db, llm, prompt = load_system()
 
 # ==========================================
-# 2. XÂY DỰNG GIAO DIỆN STREAMLIT
+# 2. GIAO DIỆN STREAMLIT (giữ nguyên)
 # ==========================================
 st.set_page_config(page_title="Chatbot Học Tập AI", page_icon="🤖")
-
 st.title("🤖 Chatbot Hỏi Đáp Tài Liệu Môn Học")
 st.markdown("Hệ thống hỗ trợ giải đáp thắc mắc dựa trên tài liệu giáo trình.")
 
-# --- SIDEBAR: Lựa chọn chế độ ---
 st.sidebar.header("⚙️ Cài đặt hệ thống")
 mode = st.sidebar.radio(
     "Chọn chế độ hoạt động:",
     ("Sử dụng RAG (Tìm trong tài liệu)", "Không dùng RAG (Hỏi LLM trực tiếp)")
 )
 
-# --- QUẢN LÝ LỊCH SỬ CHAT ---
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# Hiển thị các tin nhắn cũ
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-# --- XỬ LÝ KHUNG CHAT ---
 if user_input := st.chat_input("Nhập câu hỏi của bạn về môn học..."):
-    # 1. Hiển thị câu hỏi của người dùng
     st.session_state.messages.append({"role": "user", "content": user_input})
     with st.chat_message("user"):
         st.markdown(user_input)
 
-    # 2. Xử lý câu trả lời của Bot
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
-        full_response = ""
-
         with st.spinner("Đang suy nghĩ..."):
-            if mode == "Sử dụng RAG (Tìm trong tài liệu)":
-                # Kịch bản 1: Có RAG
-                results = db.similarity_search(user_input, k=3)
-                context_text = "\n\n".join([doc.page_content for doc in results])
-                final_prompt = prompt.format(context=context_text, question=user_input)
+            try:
+                if mode == "Sử dụng RAG (Tìm trong tài liệu)":
+                    results = db.similarity_search(user_input, k=3)
+                    context_text = "\n\n".join([doc.page_content for doc in results])
+                    final_prompt = prompt.format(context=context_text, question=user_input)
+                    with st.expander("📄 Xem các đoạn tài liệu tìm được"):
+                        st.text(context_text)
+                    full_response = llm.invoke(final_prompt).content
+                else:
+                    full_response = llm.invoke(user_input).content
 
-                # Bật expander để show tài liệu tìm được (điểm cộng lớn khi báo cáo NCKH)
-                with st.expander("📄 Xem các đoạn tài liệu tìm được"):
-                    st.text(context_text)
-
-                full_response = llm.invoke(final_prompt).content
-            else:
-                # Kịch bản 2: Không RAG (Hỏi thẳng Qwen)
-                full_response = llm.invoke(user_input).content
+            except Exception as e:
+                full_response = f"⚠️ Đã xảy ra lỗi: {str(e)}"
 
         message_placeholder.markdown(full_response)
 
-    # Lưu câu trả lời vào lịch sử
     st.session_state.messages.append({"role": "assistant", "content": full_response})
